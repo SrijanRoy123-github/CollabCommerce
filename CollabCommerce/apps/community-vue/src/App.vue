@@ -4,10 +4,11 @@
     <header>
       <h1>💬 CollabCommerce — Community Hub (Vue + Router + Vuex)</h1>
       <nav>
-        <a href="../../">Home</a>
-        <a href="../../shop/">Shop</a>
-        <a href="../../console/">OpsConsole</a>
+        <a href="/CollabCommerce/">Home</a>
+        <a href="/CollabCommerce/shop/">Shop</a>
+        <a href="/CollabCommerce/console/">OpsConsole</a>
       </nav>
+
     </header>
     <router-view />
   </div>
