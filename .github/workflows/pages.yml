@@ -17,7 +17,6 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,42 +25,47 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          
 
-      # Install deps (use legacy-peer-deps to avoid peer conflicts)
+      - name: Show repo tree (debug)
+        run: |
+          pwd
+          ls -la
+          echo "---- level 1 tree ----"
+          find . -maxdepth 2 -type d -print
+
+      - name: Detect app roots (apps vs Apps)
+        id: detect
+        run: |
+          if [ -d apps ]; then echo "APPS_ROOT=apps" >> $GITHUB_ENV;
+          elif [ -d Apps ]; then echo "APPS_ROOT=Apps" >> $GITHUB_ENV;
+          else echo "❌ No 'apps' or 'Apps' folder found at repo root"; exit 1; fi
+          if [ -d public ]; then echo "PUBLIC_ROOT=public" >> $GITHUB_ENV;
+          elif [ -d Public ]; then echo "PUBLIC_ROOT=Public" >> $GITHUB_ENV;
+          else echo "❌ No 'public' or 'Public' folder found at repo root"; exit 1; fi
+
       - name: Install React deps
-        working-directory: apps/shopfront-react
+        working-directory: ${{ env.APPS_ROOT }}/shopfront-react
         run: npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: Install Angular deps
-        working-directory: apps/opsconsole-angular
+        working-directory: ${{ env.APPS_ROOT }}/opsconsole-angular
         run: npm install --no-audit --no-fund --legacy-peer-deps
 
       - name: Install Vue deps
-        working-directory: apps/community-vue
+        working-directory: ${{ env.APPS_ROOT }}/community-vue
         run: npm install --no-audit --no-fund --legacy-peer-deps
 
-      # Build each app with clear working directories
       - name: Build React (Shopfront)
-        working-directory: apps/shopfront-react
+        working-directory: ${{ env.APPS_ROOT }}/shopfront-react
         run: npm run build
 
       - name: Build Angular (OpsConsole)
-        working-directory: apps/opsconsole-angular
+        working-directory: ${{ env.APPS_ROOT }}/opsconsole-angular
         run: npm run build
 
       - name: Build Vue (Community)
-        working-directory: apps/community-vue
+        working-directory: ${{ env.APPS_ROOT }}/community-vue
         run: npm run build
-
-      - name: List build outputs (debug)
-        run: |
-          echo "=== React dist ==="
-          ls -la apps/shopfront-react/dist || true
-          echo "=== Angular dist (full tree) ==="
-          find apps/opsconsole-angular/dist -maxdepth 3 -type d -print || true
-          echo "=== Vue dist ==="
-          ls -la apps/community-vue/dist || true
 
       - name: Assemble static site
         shell: bash
@@ -70,26 +74,20 @@ jobs:
           mkdir -p _site/shop _site/console _site/community _site/data
 
           # React
-          cp -r apps/shopfront-react/dist/* _site/shop/
+          cp -r "${APPS_ROOT}/shopfront-react/dist/"* _site/shop/
 
-          # Angular (dist layout can vary; detect index.html)
-          ANG_DIST="apps/opsconsole-angular/dist"
-          if [ -f "$ANG_DIST/index.html" ]; then
-            SRC="$ANG_DIST"
-          else
-            # find the folder that contains index.html (handles dist/<proj>/browser etc.)
-            SRC=$(find "$ANG_DIST" -name index.html -print -quit | xargs dirname)
-          fi
-          if [ -z "$SRC" ]; then
-            echo "Angular build not found"; exit 1
-          fi
-          cp -r "$SRC"/* _site/console/
+          # Angular: detect where index.html landed
+          ANG_DIST="${APPS_ROOT}/opsconsole-angular/dist"
+          if [ -f "$ANG_DIST/index.html" ]; then SRC="$ANG_DIST";
+          else SRC=$(find "$ANG_DIST" -name index.html -print -quit | xargs dirname); fi
+          if [ -z "$SRC" ]; then echo "Angular build not found"; exit 1; fi
+          cp -r "$SRC/"* _site/console/
 
           # Vue
-          cp -r apps/community-vue/dist/* _site/community/
+          cp -r "${APPS_ROOT}/community-vue/dist/"* _site/community/
 
           # Mock data + landing
-          cp -r public/data _site/data
+          cp -r "${PUBLIC_ROOT}/data" _site/data
 
           cat > _site/index.html <<'HTML'
           <!doctype html>
