@@ -28,9 +28,10 @@ jobs:
 
       - name: Install dependencies per app
         run: |
-          cd apps/shopfront-react && npm ci && cd ../../
-          cd apps/opsconsole-angular && npm ci && cd ../../
-          cd apps/community-vue && npm ci && cd ../../
+          cd apps/shopfront-react && npm install --no-audit --no-fund && cd ../../
+          cd apps/opsconsole-angular && npm install --no-audit --no-fund && cd ../../
+          cd apps/community-vue && npm install --no-audit --no-fund && cd ../../
+
 
       - name: Build React (Shopfront)
         run: |
