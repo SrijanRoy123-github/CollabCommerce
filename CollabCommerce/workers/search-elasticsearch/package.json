@@ -1,0 +1,11 @@
+{
+  "name": "search-elasticsearch-worker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node worker.js"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^8.15.0"
+  }
+}

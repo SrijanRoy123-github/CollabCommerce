@@ -1,0 +1,20 @@
+[
+  {
+    "sku": "SKU-001",
+    "name": "Aurora Headphones",
+    "qty": 42,
+    "vendor": "Acme Audio"
+  },
+  {
+    "sku": "SKU-002",
+    "name": "Nebula Keyboard",
+    "qty": 30,
+    "vendor": "KeyWorks"
+  },
+  {
+    "sku": "SKU-003",
+    "name": "Quasar Mouse",
+    "qty": 75,
+    "vendor": "ClickCorp"
+  }
+]

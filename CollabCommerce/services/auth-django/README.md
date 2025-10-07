@@ -1,0 +1,1 @@
+Django/DRF skeleton for JWT/OAuth auth service. Run `django-admin startproject` to expand.

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "How to pair Aurora headphones?",
+    "votes": 12,
+    "author": "alex",
+    "body": "Hold the power button 5s until LED blinks."
+  },
+  {
+    "id": 2,
+    "title": "Keyboard macros not working",
+    "votes": 7,
+    "author": "mira",
+    "body": "Enable macro mode in settings panel."
+  }
+]

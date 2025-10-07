@@ -1,0 +1,8 @@
+
+{
+  "name": "c3/content-laravel",
+  "type": "project",
+  "require": {
+    "laravel/framework": "^11.0"
+  }
+}

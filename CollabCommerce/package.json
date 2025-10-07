@@ -1,0 +1,16 @@
+{
+  "name": "collabcommerce-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "services/*",
+    "workers/*"
+  ],
+  "scripts": {
+    "build": "echo Build all workspaces via npm run build --workspaces",
+    "test": "echo Run per-package tests",
+    "postinstall": "echo Workspaces installed"
+  },
+  "devDependencies": {}
+}
