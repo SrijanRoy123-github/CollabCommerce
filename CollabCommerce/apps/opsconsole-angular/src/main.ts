@@ -38,7 +38,7 @@ import { FormsModule } from '@angular/forms';
 class AppComponent {
   inventory = []
   constructor(){
-    fetch('../../data/inventory.json').then(r=>r.json()).then(d=>this.inventory = d)
+    fetch('/CollabCommerce/data/inventory.json').then(r=>r.json()).then(d=>this.inventory = d)
   }
 }
 
