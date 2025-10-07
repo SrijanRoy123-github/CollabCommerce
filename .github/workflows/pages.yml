@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,37 +26,71 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install dependencies per app
-        run: |
-          cd apps/shopfront-react && npm install --no-audit --no-fund && cd ../../
-          cd apps/opsconsole-angular && npm install --no-audit --no-fund && cd ../../
-          cd apps/community-vue && npm install --no-audit --no-fund && cd ../../
+      # Install deps (use legacy-peer-deps to avoid peer conflicts)
+      - name: Install React deps
+        working-directory: apps/shopfront-react
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
+      - name: Install Angular deps
+        working-directory: apps/opsconsole-angular
+        run: npm install --no-audit --no-fund --legacy-peer-deps
 
+      - name: Install Vue deps
+        working-directory: apps/community-vue
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      # Build each app with clear working directories
       - name: Build React (Shopfront)
-        run: |
-          cd apps/shopfront-react
-          npm run build
-          cd ../../
+        working-directory: apps/shopfront-react
+        run: npm run build
+
       - name: Build Angular (OpsConsole)
-        run: |
-          cd apps/opsconsole-angular
-          npm run build
-          cd ../../
+        working-directory: apps/opsconsole-angular
+        run: npm run build
+
       - name: Build Vue (Community)
+        working-directory: apps/community-vue
+        run: npm run build
+
+      - name: List build outputs (debug)
         run: |
-          cd apps/community-vue
-          npm run build
-          cd ../../
+          echo "=== React dist ==="
+          ls -la apps/shopfront-react/dist || true
+          echo "=== Angular dist (full tree) ==="
+          find apps/opsconsole-angular/dist -maxdepth 3 -type d -print || true
+          echo "=== Vue dist ==="
+          ls -la apps/community-vue/dist || true
 
       - name: Assemble static site
+        shell: bash
         run: |
+          set -e
           mkdir -p _site/shop _site/console _site/community _site/data
+
+          # React
           cp -r apps/shopfront-react/dist/* _site/shop/
-          cp -r apps/opsconsole-angular/dist/* _site/console/
+
+          # Angular (dist layout can vary; detect index.html)
+          ANG_DIST="apps/opsconsole-angular/dist"
+          if [ -f "$ANG_DIST/index.html" ]; then
+            SRC="$ANG_DIST"
+          else
+            # find the folder that contains index.html (handles dist/<proj>/browser etc.)
+            SRC=$(find "$ANG_DIST" -name index.html -print -quit | xargs dirname)
+          fi
+          if [ -z "$SRC" ]; then
+            echo "Angular build not found"; exit 1
+          fi
+          cp -r "$SRC"/* _site/console/
+
+          # Vue
           cp -r apps/community-vue/dist/* _site/community/
+
+          # Mock data + landing
           cp -r public/data _site/data
+
           cat > _site/index.html <<'HTML'
           <!doctype html>
           <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
