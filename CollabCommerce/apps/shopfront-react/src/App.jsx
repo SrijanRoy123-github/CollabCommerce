@@ -13,7 +13,7 @@ export default function App() {
   const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem('cart')||'[]'))
 
   useEffect(() => {
-    fetch('../../data/products.json').then(r => r.json()).then(setProducts)
+    fetch('/CollabCommerce/data/products.json').then(r => r.json()).then(setProducts)
   }, [])
 
   useEffect(() => {
