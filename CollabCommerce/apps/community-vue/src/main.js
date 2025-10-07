@@ -11,7 +11,7 @@ const store = createStore({
   mutations:{ setPosts(s, p){ s.posts = p }, upvote(s, id){ const p=s.posts.find(x=>x.id===id); if(p) p.votes++ } },
   actions:{
     async load({commit}){
-      const res = await fetch('../../data/posts.json')
+      const res = await fetch('/CollabCommerce/data/posts.json')
       commit('setPosts', await res.json())
     }
   }
