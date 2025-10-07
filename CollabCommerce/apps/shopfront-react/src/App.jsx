@@ -33,10 +33,11 @@ export default function App() {
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">🛍️ CollabCommerce — Shopfront (React + Tailwind)</h1>
         <nav className="space-x-3 text-sm">
-          <a className="underline" href="../../">Home</a>
-          <a className="underline" href="../../console/">OpsConsole</a>
-          <a className="underline" href="../../community/">Community</a>
+          <a className="underline" href="/CollabCommerce/">Home</a>
+          <a className="underline" href="/CollabCommerce/console/">OpsConsole</a>
+          <a className="underline" href="/CollabCommerce/community/">Community</a>
         </nav>
+
       </header>
 
       <section className="grid md:grid-cols-3 gap-4">
