@@ -1,0 +1,87 @@
+name: Build & Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies per app
+        run: |
+          cd apps/shopfront-react && npm ci && cd ../../
+          cd apps/opsconsole-angular && npm ci && cd ../../
+          cd apps/community-vue && npm ci && cd ../../
+
+      - name: Build React (Shopfront)
+        run: |
+          cd apps/shopfront-react
+          npm run build
+          cd ../../
+      - name: Build Angular (OpsConsole)
+        run: |
+          cd apps/opsconsole-angular
+          npm run build
+          cd ../../
+      - name: Build Vue (Community)
+        run: |
+          cd apps/community-vue
+          npm run build
+          cd ../../
+
+      - name: Assemble static site
+        run: |
+          mkdir -p _site/shop _site/console _site/community _site/data
+          cp -r apps/shopfront-react/dist/* _site/shop/
+          cp -r apps/opsconsole-angular/dist/* _site/console/
+          cp -r apps/community-vue/dist/* _site/community/
+          cp -r public/data _site/data
+          cat > _site/index.html <<'HTML'
+          <!doctype html>
+          <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>CollabCommerce</title>
+          <style>body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:40px} a{display:block;margin:12px 0;font-size:18px}</style>
+          </head><body>
+          <h1>CollabCommerce Cloud — Pages Demo</h1>
+          <p>Pick a module:</p>
+          <a href="./shop/">🛍️ Shopfront (React + Tailwind)</a>
+          <a href="./console/">🛠️ OpsConsole (Angular + Bootstrap)</a>
+          <a href="./community/">💬 Community Hub (Vue + Vuex + Router)</a>
+          <p>Mock data: <a href="./data/products.json">products.json</a>, <a href="./data/inventory.json">inventory.json</a>, <a href="./data/posts.json">posts.json</a></p>
+          </body></html>
+          HTML
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
