@@ -4,6 +4,8 @@ import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
 
 // In DEMO mode, we don't have a real GraphQL backend. We still instantiate a client so
 // the tech is "used". In production, point 'uri' to your gateway URL.
+const genOrderId = () => 'ORD-' + Math.random().toString(36).slice(2, 8).toUpperCase()
+
 const client = new ApolloClient({ uri: '/graphql', cache: new InMemoryCache() })
 
 const formatPrice = (p) => '₹' + (p.toFixed(2))
@@ -61,7 +63,22 @@ export default function App() {
         <div className="mt-3 flex justify-between font-semibold">
           <span>Total</span><span>{formatPrice(total)}</span>
         </div>
-        <button className="mt-3 px-3 py-2 rounded-xl bg-green-600 text-white">Checkout (Stripe - mocked)</button>
+        <button
+            className="mt-3 px-3 py-2 rounded-xl bg-green-600 text-white"
+            onClick={() => {
+              if (cart.length === 0) { alert('Your cart is empty'); return; }
+              const id = genOrderId();
+              // Save a fake order record locally (for demo)
+              const orders = JSON.parse(localStorage.getItem('orders')||'[]');
+              orders.push({ id, items: cart, total, at: new Date().toISOString() });
+              localStorage.setItem('orders', JSON.stringify(orders));
+              setCart([]); // clear cart
+              alert(`✅ Payment captured (demo)\nOrder: ${id}\nTotal: ₹${total.toFixed(2)}`);
+            }}
+          >
+  Checkout (Demo)
+</button>
+
       </section>
     </div>
   )
