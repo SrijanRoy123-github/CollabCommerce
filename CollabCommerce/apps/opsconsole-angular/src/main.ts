@@ -3,7 +3,7 @@ import 'zone.js';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { FormsModule } from '@angular/forms'; 
 @Component({
   selector: 'app-root',
   standalone: true,
