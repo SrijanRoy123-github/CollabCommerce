@@ -31,10 +31,9 @@ jobs:
         shell: bash
         run: |
           set -e
-          # Find the folder that contains an 'apps' dir
+          # Find the folder that contains an 'apps' dir (works even if nested)
           ROOT_DIR="$(dirname "$(find . -type d -name apps -print -quit)")"
-          if [ -z "$ROOT_DIR" ] || [ "$ROOT_DIR" = "." ] && [ ! -d "./apps" ]; then
-            # try common nested name
+          if { [ -z "$ROOT_DIR" ] || { [ "$ROOT_DIR" = "." ] && [ ! -d "./apps" ]; }; }; then
             if [ -d "./CollabCommerce/apps" ]; then ROOT_DIR="./CollabCommerce"; fi
           fi
           if [ -z "$ROOT_DIR" ] || [ ! -d "$ROOT_DIR/apps" ]; then
@@ -84,7 +83,7 @@ jobs:
           # React
           cp -r "${APPS_ROOT}/shopfront-react/dist/"* _site/shop/
 
-          # Angular (detect index.html location)
+          # Angular: detect where index.html landed
           ANG_DIST="${APPS_ROOT}/opsconsole-angular/dist"
           if [ -f "$ANG_DIST/index.html" ]; then SRC="$ANG_DIST";
           else SRC=$(find "$ANG_DIST" -name index.html -print -quit | xargs dirname); fi
@@ -94,9 +93,10 @@ jobs:
           # Vue
           cp -r "${APPS_ROOT}/community-vue/dist/"* _site/community/
 
-          # Mock data + landing
-          cp -r "${PUBLIC_ROOT}/data" _site/data
+          # Mock data (avoid nesting /data/data)
+          cp -r "${PUBLIC_ROOT}/data/"* _site/data/
 
+          # Landing page
           cat > _site/index.html <<'HTML'
           <!doctype html>
           <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
