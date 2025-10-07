@@ -13,10 +13,11 @@ import { FormsModule } from '@angular/forms';
     <div class="d-flex justify-content-between align-items-center">
       <h1 class="brand">🛠️ CollabCommerce — OpsConsole (Angular + Bootstrap)</h1>
       <nav>
-        <a class="me-3" href="../../">Home</a>
-        <a class="me-3" href="../../shop/">Shop</a>
-        <a class="" href="../../community/">Community</a>
+        <a class="me-3" href="/CollabCommerce/">Home</a>
+        <a class="me-3" href="/CollabCommerce/shop/">Shop</a>
+        <a class="" href="/CollabCommerce/community/">Community</a>
       </nav>
+
     </div>
     <hr/>
     <p class="text-muted">Inventory from mock API. Edit quantities in-memory.</p>
