@@ -12,10 +12,11 @@
             "outputPath": "dist/opsconsole",
             "index": "src/index.html",
             "main": "src/main.ts",
+            "polyfills": [],
             "tsConfig": "tsconfig.app.json",
             "assets": [],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -31,7 +32,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": { "browserTarget": "opsconsole:build" }
+          "options": {
+            "browserTarget": "opsconsole:build"
+          }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -41,7 +44,7 @@
             "tsConfig": "tsconfig.spec.json",
             "scripts": [],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
             "assets": []
