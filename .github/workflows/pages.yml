@@ -26,22 +26,30 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Show repo tree (debug)
-        run: |
-          pwd
-          ls -la
-          echo "---- level 1 tree ----"
-          find . -maxdepth 2 -type d -print
-
-      - name: Detect app roots (apps vs Apps)
+      - name: Detect project root (handles nested CollabCommerce/)
         id: detect
+        shell: bash
         run: |
-          if [ -d apps ]; then echo "APPS_ROOT=apps" >> $GITHUB_ENV;
-          elif [ -d Apps ]; then echo "APPS_ROOT=Apps" >> $GITHUB_ENV;
-          else echo "❌ No 'apps' or 'Apps' folder found at repo root"; exit 1; fi
-          if [ -d public ]; then echo "PUBLIC_ROOT=public" >> $GITHUB_ENV;
-          elif [ -d Public ]; then echo "PUBLIC_ROOT=Public" >> $GITHUB_ENV;
-          else echo "❌ No 'public' or 'Public' folder found at repo root"; exit 1; fi
+          set -e
+          # Find the folder that contains an 'apps' dir
+          ROOT_DIR="$(dirname "$(find . -type d -name apps -print -quit)")"
+          if [ -z "$ROOT_DIR" ] || [ "$ROOT_DIR" = "." ] && [ ! -d "./apps" ]; then
+            # try common nested name
+            if [ -d "./CollabCommerce/apps" ]; then ROOT_DIR="./CollabCommerce"; fi
+          fi
+          if [ -z "$ROOT_DIR" ] || [ ! -d "$ROOT_DIR/apps" ]; then
+            echo "❌ Could not find an 'apps' folder anywhere."; exit 1
+          fi
+
+          # Detect public folder under the same root
+          if [ -d "$ROOT_DIR/public" ]; then PUBLIC_DIR="$ROOT_DIR/public";
+          elif [ -d "$ROOT_DIR/Public" ]; then PUBLIC_DIR="$ROOT_DIR/Public";
+          else echo "❌ Could not find 'public' under $ROOT_DIR"; exit 1; fi
+
+          echo "ROOT_DIR=$ROOT_DIR" >> $GITHUB_ENV
+          echo "APPS_ROOT=$ROOT_DIR/apps" >> $GITHUB_ENV
+          echo "PUBLIC_ROOT=$PUBLIC_DIR" >> $GITHUB_ENV
+          echo "Using ROOT_DIR=$ROOT_DIR"
 
       - name: Install React deps
         working-directory: ${{ env.APPS_ROOT }}/shopfront-react
@@ -76,7 +84,7 @@ jobs:
           # React
           cp -r "${APPS_ROOT}/shopfront-react/dist/"* _site/shop/
 
-          # Angular: detect where index.html landed
+          # Angular (detect index.html location)
           ANG_DIST="${APPS_ROOT}/opsconsole-angular/dist"
           if [ -f "$ANG_DIST/index.html" ]; then SRC="$ANG_DIST";
           else SRC=$(find "$ANG_DIST" -name index.html -print -quit | xargs dirname); fi
