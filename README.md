@@ -1,5 +1,7 @@
 
-CollabCommerce Cloud (C3): a polyglot, full-stack platform that unifies a React shopfront, Angular admin console, and Vue community with a microservices backend; statically deployed on GitHub Pages with live Stripe Checkout via a Node/Express API on Render.
+CollabCommerce Cloud (C3): 
+
+a polyglot, full-stack platform that unifies a React shopfront, Angular admin console, and Vue community with a microservices backend; statically deployed on GitHub Pages with live Stripe Checkout via a Node/Express API on Render.
 
 Tech Stack Highlights
 
